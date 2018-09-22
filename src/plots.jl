@@ -1,6 +1,6 @@
 using Spikes
 using DataFrames
-using Plots: plot, scatter
+using Plots
 using StatPlots
 using RDatasets
 using Query
@@ -173,7 +173,6 @@ function plotWeightSeries(
     plot(
         plots...,
         layout=(numRows, numCols),
-        #layout=length(dataFrames),
         legend=false,
         size=(600 * numCols, 300 * numRows)
     )
