@@ -79,7 +79,9 @@ function plotSeries(
         scat
     end
 
+    # grab the number of subplots (i.e. the number of runs in the simulation series)
     numSeries::Int = length(dataFrames)
+    
     numTracesPerPlot::Int = 1
     plots = []
     for entry in sort(collect(dataFrames), by = key -> key[1])
@@ -112,7 +114,28 @@ function plotSeries(
     )
 end
 
-function xLabel(args, index, numSeries, numCols)
+
+"""
+xLabel(args, index, numSeries, numCols)
+
+Private method for creating the x-axis label based on the subplot number
+and whether or not the xLabel was passed into the plotSeries(...) function.
+
+# Arguments
+* `args::Union{Base.Iterators.Pairs{}, NamedTuple{}}`: The function arguments 
+    passed into the plotSeries(...) function
+* `index::Int`: The current subplot number
+* `numSeries::Int`: The number of simulations (series) in the plot
+* `numCols::Int`: The number of columns in the plot figure
+
+# Returns
+The enriched function arguments passed to the plotSeries(...) function
+"""
+function xLabel(
+    args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
+    index::Int, numSeries::Int, 
+    numCols::Int
+    )
     if haskey(args, :xLabel)
         label = index > numSeries - numCols ? args[:xLabel] : ""
         return (args..., xLabel=label)
@@ -120,7 +143,26 @@ function xLabel(args, index, numSeries, numCols)
     return index > numSeries - numCols ? args : (args..., xLabel="")
 end
 
-function yLabel(args, index, numCols)
+"""
+yLabel(args, index, numCols)
+
+Private method for creating the y-axis label based on the subplot number
+and whether or not the yLabel was passed into the plotSeries(...) function.
+
+# Arguments
+* `args::Union{Base.Iterators.Pairs{}, NamedTuple{}}`: The function arguments
+     passed into the plotSeries(...) function
+* `index::Int`: The current subplot number
+* `numCols::Int`: The number of columns in the plot figure
+
+# Returns
+The enriched function arguments passed to the plotSeries(...) function
+"""
+function yLabel(
+    args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
+    index::Int, 
+    numCols::Int
+    )
     if haskey(args, :yLabel)
         label = index % numCols == 1 ? args[:yLabel] : ""
         return (args..., yLabel=label)
@@ -128,7 +170,24 @@ function yLabel(args, index, numCols)
     return index % numCols == 1 ? args : (args..., yLabel="")
 end
 
-function title(args, index)
+"""
+title(args, index)
+
+Private method for creating the subplot title based on the subplot number
+and whether or not the title was passed into the plotSeries(...) function.
+
+# Arguments
+* `args::Union{Base.Iterators.Pairs{}, NamedTuple{}}`: The function arguments 
+    passed into the plotSeries(...) function
+* `index::Int`: The current subplot number
+
+# Returns
+The enriched function arguments passed to the plotSeries(...) function
+"""
+function title(
+    args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
+    index::Int
+    )
     if haskey(args, :title)
         title = index >= 0 ? "($index)   " : args[:title]
         return (args..., title=title)
