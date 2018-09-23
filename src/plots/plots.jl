@@ -52,8 +52,9 @@ plotSeries(
     title::String = ""
 )
 
-Creates a page of connection-weight time-series subplots, one for each run (series).
-Provides a convenient way to compare the weight time-series from a series of runs.
+Creates a page of time-series subplots, one for each run (series), created by calling 
+the specified plot function. Provides a convenient way to compare the weight time-series 
+from a series of runs.
 
 # Arguments
 * `dataFrames::Dict{Integer, DataFrame}`: A dictionary holding the series-number -> DataFrame
