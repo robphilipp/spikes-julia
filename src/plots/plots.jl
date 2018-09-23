@@ -62,17 +62,13 @@ from a series of runs.
         label for the x-axis, the label for the y-axis, and the plot title
 * `numCols::Int`: Optional name parameter the specifies the number of subplot columns. The
         default value is 2 columns.
-* `xAxisLabel::String`: Optional label for the x-axis. Default value is "t (ms)".
-* `yAxisLabel::String`: Optional label for the y-axis. Default value is an empty string.
-* `title::String`: Optional title for the plot
+* `functionArgs`: The optional arguments that need to passed to the function
 """
 function plotSeries(
     dataFrames::Dict{Integer, DataFrame},
     plotFunction::Function;
     numCols::Int = 2,
-    xAxisLabel::String = "t (ms)",
-    yAxisLabel::String = "",
-    title::String = ""
+    functionArgs...
 )
 
     numRows::Int = ceil(length(dataFrames) / numCols)
@@ -83,22 +79,22 @@ function plotSeries(
         scat
     end
 
+    numSeries::Int = length(dataFrames)
     numTracesPerPlot::Int = 1
     plots = []
     for entry in sort(collect(dataFrames), by = key -> key[1])
         index = entry[1]
         dataFrame = entry[2]
 
+        # pull out the arguments that are defined
+        args = xLabel(functionArgs, index, numSeries, numCols)
+        args = yLabel(args, index, numCols)
+        args = title(args, index)
+
         # create the axis identifiers. The first plot gets the largest y-axis id
         # so that the first dataframe in the series is the first plot at the top
         # left-hand side of the page
-        scatters = plotFunction(
-            dataFrame,
-            series = index,
-            xaxis = index > length(dataFrames) - numCols ? xAxisLabel : "", 
-            yaxis = index % numCols == 1 ? yAxisLabel : "",
-            title = "$(index >= 0 ? "($index)" : title)"
-        )
+        scatters = plotFunction(dataFrame, series = index; args...)
 
         # keep track of the number of traces per subplot for selecting col
         numTracesPerPlot = max(numTracesPerPlot, length(scatters))
@@ -108,7 +104,6 @@ function plotSeries(
     end
 
     # create and return the plot
-    # plot(vcat(plots...), style=style)
     plot(
         plots...,
         layout=(numRows, numCols),
@@ -117,3 +112,26 @@ function plotSeries(
     )
 end
 
+function xLabel(args, index, numSeries, numCols)
+    if haskey(args, :xLabel)
+        label = index > numSeries - numCols ? args[:xLabel] : ""
+        return (args..., xLabel=label)
+    end
+    return index > numSeries - numCols ? args : (args..., xLabel="")
+end
+
+function yLabel(args, index, numCols)
+    if haskey(args, :yLabel)
+        label = index % numCols == 1 ? args[:yLabel] : ""
+        return (args..., yLabel=label)
+    end
+    return index % numCols == 1 ? args : (args..., yLabel="")
+end
+
+function title(args, index)
+    if haskey(args, :title)
+        title = index >= 0 ? "($index)   " : args[:title]
+        return (args..., title=title)
+    end
+    return index >= 0 ? (args..., title="($index)   ") : args
+end

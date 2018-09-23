@@ -1,7 +1,7 @@
 include("plots.jl")
 
 """
-plotWeights(dataFrame, series, xaxis, yaxis)
+plotWeights(dataFrame, series, xLabel, yaxis)
 
 A scatter plot of the connection weights as a function of 
 time for all the connections in the network.
@@ -9,8 +9,9 @@ time for all the connections in the network.
 # Arguments
 * `dataFrame::DataFrame`: The data-frame holding the log weight-update events
 * `series::Int`: (Optional) The series number
-* `xaxis::String`: (Optional) The id for the x-axis
-* `yaxis::String`:(Optional) The id for the y-axis
+* `xLabel::String`: (Optional) The id for the x-axis
+* `yaxis::String`: (Optional) The id for the y-axis
+* `title::String`: (Optional) The title for the plot
 
 # Returns
 A `Plots.plot`
@@ -18,9 +19,9 @@ A `Plots.plot`
 function plotWeights(
     dataFrame::DataFrame;
     series::Int=-1, 
-    xaxis::String="t (ms)", 
-    yaxis::String="w(t)", 
-    title::String="weights"
+    xLabel=xLabel::String="t (ms)", 
+    yLabel=yLabel::String="w(t)", 
+    title=title::String="weights"
 )::Plots.Plot
     if size(dataFrame)[1] == 0
         return "No learning data available to plot; please ensure that you are logging learning data"
@@ -41,8 +42,8 @@ function plotWeights(
         title=title,
         titlefont=font(8),
         titleloc=series > 0 ? :right : :center,
-        xlabel=xaxis,
-        ylabel=yaxis
+        xlabel=xLabel,
+        ylabel=yLabel
     );
     i = 1
     for series in weightSeries
