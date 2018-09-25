@@ -19,9 +19,10 @@ A `Plots.plot`
 function plotMembranePotential(
     dataFrame::DataFrame;
     series::Int=-1, 
-    xLabel=xLabel::String="t (ms)", 
-    yLabel=yLabel::String="u(t) (mV)", 
-    title=title::String="membrane potential"
+    xLabel::String="t (ms)", 
+    yLabel::String="u(t) (mV)", 
+    title::String="membrane potential",
+    args...
 )::Plots.Plot
     if size(dataFrame)[1] == 0
         return "No update data available to plot; please ensure that you are logging update data"
@@ -34,7 +35,7 @@ function plotMembranePotential(
     # of data
     potentialSeries = groupby(potentials, [:neuron_id], sort = true)
 
-    # now plot each one
+    # create the base plot
     seriesPlot = plot(
         title=title,
         titlefont=font(8),
@@ -42,6 +43,8 @@ function plotMembranePotential(
         xlabel=xLabel,
         ylabel=yLabel
     );
+
+    # add each trace (time series) to the plot
     i = 1
     for series in potentialSeries
         seriesPlot = addSeriesToPlot(

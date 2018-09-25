@@ -62,12 +62,16 @@ from a series of runs.
         label for the x-axis, the label for the y-axis, and the plot title
 * `numCols::Int`: Optional name parameter the specifies the number of subplot columns. The
         default value is 2 columns.
+* `width::Int`: Optional width of each subplot
+* `height::Int`: Optional height of each subplot
 * `functionArgs`: The optional arguments that need to passed to the function
 """
 function plotSeries(
     dataFrames::Dict{Integer, DataFrame},
     plotFunction::Function;
     numCols::Int = 2,
+    width::Int = 600,
+    height::Int = 300,
     functionArgs...
 )
 
@@ -81,17 +85,20 @@ function plotSeries(
 
     # grab the number of subplots (i.e. the number of runs in the simulation series)
     numSeries::Int = length(dataFrames)
-    
+
     numTracesPerPlot::Int = 1
     plots = []
     for entry in sort(collect(dataFrames), by = key -> key[1])
         index = entry[1]
         dataFrame = entry[2]
 
-        # pull out the arguments that are defined
-        args = xLabel(functionArgs, index, numSeries, numCols)
-        args = yLabel(args, index, numCols)
-        args = title(args, index)
+        # set the x-axis label, y-axis label, title
+        args = createXLabel(functionArgs, index, numSeries, numCols)
+        args = createYLabel(args, index, numCols)
+        args = createTitle(args, index)
+
+        # add the height and width of the subplots to the arguments
+        args = (args..., width=width, height=height)
 
         # create the axis identifiers. The first plot gets the largest y-axis id
         # so that the first dataframe in the series is the first plot at the top
@@ -110,7 +117,7 @@ function plotSeries(
         plots...,
         layout=(numRows, numCols),
         legend=false,
-        size=(600 * numCols, 300 * numRows)
+        size=(width * numCols, height * numRows)
     )
 end
 
@@ -131,16 +138,17 @@ and whether or not the xLabel was passed into the plotSeries(...) function.
 # Returns
 The enriched function arguments passed to the plotSeries(...) function
 """
-function xLabel(
+function createXLabel(
     args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
-    index::Int, numSeries::Int, 
+    index::Int, 
+    numSeries::Int, 
     numCols::Int
     )
     if haskey(args, :xLabel)
         label = index > numSeries - numCols ? args[:xLabel] : ""
-        return (args..., xLabel=label)
+        return (args..., xLabel = label)
     end
-    return index > numSeries - numCols ? args : (args..., xLabel="")
+    return index > numSeries - numCols ? args : (args..., xLabel = "")
 end
 
 """
@@ -158,16 +166,16 @@ and whether or not the yLabel was passed into the plotSeries(...) function.
 # Returns
 The enriched function arguments passed to the plotSeries(...) function
 """
-function yLabel(
+function createYLabel(
     args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
     index::Int, 
     numCols::Int
     )
     if haskey(args, :yLabel)
         label = index % numCols == 1 ? args[:yLabel] : ""
-        return (args..., yLabel=label)
+        return (args..., yLabel = label)
     end
-    return index % numCols == 1 ? args : (args..., yLabel="")
+    return index % numCols == 1 ? args : (args..., yLabel = "")
 end
 
 """
@@ -184,7 +192,7 @@ and whether or not the title was passed into the plotSeries(...) function.
 # Returns
 The enriched function arguments passed to the plotSeries(...) function
 """
-function title(
+function createTitle(
     args::Union{Base.Iterators.Pairs{}, NamedTuple{}}, 
     index::Int
     )

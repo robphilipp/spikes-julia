@@ -1,5 +1,56 @@
 include("plots.jl")
 
+function plotSpikesTimes(
+    dataFrame::DataFrame;
+    series::Int=-1, 
+    xLabel::String="t (ms)", 
+    yLabel::String="", 
+    title::String="weights",
+    width=width,
+    height=height
+)
+::Plots.Plot
+    if size(dataFrame)[1] == 0
+        return "No update data available to plot; please ensure that you are logging update data"
+    end
+
+    # make a copy of the data frame
+    spikes = DataFrame(dataFrame)
+
+    # group by the connections to get an array of dataframes, each holding the time-series
+    # of data
+    spikeSeries = groupby(spikes, [:neuron_id], sort = true)
+
+    # calculate the size (in pixels) of the market
+    markerSize::Int = height/length(spikeSeries)
+
+    # now plot each one
+    seriesPlot = scatter(
+        title=title,
+        titlefont=font(8),
+        titleloc=series > 0 ? :right : :center,
+        xlabel=xLabel,
+        ylabel=yLabel,
+        markershape=:vline,
+        markersize=markerSize
+    );
+    i = 1
+    for series in spikeSeries
+        # create the y-values of the series that all have the same value
+        # and are aligned with the neuron id
+        y = ones(length(spikeSeries[i][:signal_time])) .* i
+
+        seriesPlot = addSeriesToPlot(
+            series[:signal_time], 
+            y, 
+            seriesPlot, 
+            name=series[:neuron_id][i]
+        )
+        i += 1
+    end
+    seriesPlot
+end
+
 """
   plotSpikes( spikes, neurons, titleString )
 

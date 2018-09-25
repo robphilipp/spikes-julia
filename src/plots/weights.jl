@@ -19,9 +19,10 @@ A `Plots.plot`
 function plotWeights(
     dataFrame::DataFrame;
     series::Int=-1, 
-    xLabel=xLabel::String="t (ms)", 
-    yLabel=yLabel::String="w(t)", 
-    title=title::String="weights"
+    xLabel::String="t (ms)", 
+    yLabel::String="w(t)", 
+    title::String="weights",
+    args...
 )::Plots.Plot
     if size(dataFrame)[1] == 0
         return "No learning data available to plot; please ensure that you are logging learning data"
@@ -37,7 +38,7 @@ function plotWeights(
     # of data
     weightSeries = groupby(weights, [:connection], sort = true)
 
-    # now plot each one
+    # create the base plot
     seriesPlot = plot(
         title=title,
         titlefont=font(8),
@@ -45,6 +46,8 @@ function plotWeights(
         xlabel=xLabel,
         ylabel=yLabel
     );
+
+    # add each of the traces (time series) to the plot
     i = 1
     for series in weightSeries
         seriesPlot = addSeriesToPlot(
