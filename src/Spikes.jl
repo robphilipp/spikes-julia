@@ -19,6 +19,7 @@ include("learning.jl")
 include("plots/plots.jl")
 include("plots/weights.jl")
 include("plots/membrane-potential.jl")
+include("plots/spikes.jl")
 
 # end of module Spikes
 end

@@ -25,7 +25,7 @@ end
 
 
 """
-plotSeries(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; name = "")
+addSeriesToPlot(x, y, plot, name = "")
 
 Adds the (x, y)-pair series to the plot and returns the updated plot
 
@@ -33,13 +33,41 @@ Adds the (x, y)-pair series to the plot and returns the updated plot
 * `x::Array{Float64,1}`: The x-values in the plot
 * `y::Array{Float64,1}`: The y-values in the plot
 * `p::Plots.Plot`: The plot to which to add the series
-* `name::String`: The (optional) name of the series
+* `args::NamedTuple`: Additional parameters that are passed down to the plot
 
 # Returns
 A `Plots.Plot`
 """
-function addSeriesToPlot(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; name = "")
+function addSeriesToPlot(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; args...)
+    name = haskey(args, :label) ? args[:label] : ""
     plot!(p, x, y, label=name, hover=hoverLabels(x, y, name))
+end
+
+"""
+addSeriesToScatter(x, y, scatter, args...)
+
+Adds the (x, y)-pair series to the scatter-plot and returns the updated plot
+
+# Arguments
+* `x::Array{Float64,1}`: The x-values in the plot
+* `y::Array{Float64,1}`: The y-values in the plot
+* `p::Plots.Plot`: The plot to which to add the series
+* `args::NamedTuple`: Additional parameters that are passed down to the plot
+
+# Returns
+A `Plots.Plot`
+"""
+function addSeriesToScatter(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; args...)
+    name = haskey(args, :label) ? args[:label] : ""
+    scatter!(
+        p, 
+        x, 
+        y, 
+        label=name, 
+        hover=hoverLabels(x, y, name),
+        markershape=haskey(args, :markershape) ? args[:markershape] : :vline;
+        args...
+    )
 end
 
 """
@@ -97,8 +125,8 @@ function plotSeries(
         args = createYLabel(args, index, numCols)
         args = createTitle(args, index)
 
-        # add the height and width of the subplots to the arguments
-        args = (args..., width=width, height=height)
+        # add the size (width, height) of the subplots to the arguments
+        args = (args..., size=(width, height))
 
         # create the axis identifiers. The first plot gets the largest y-axis id
         # so that the first dataframe in the series is the first plot at the top
