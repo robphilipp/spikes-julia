@@ -84,22 +84,20 @@ Creates a page of time-series subplots, one for each run (series), created by ca
 the specified plot function. Provides a convenient way to compare the weight time-series 
 from a series of runs.
 
+Accepts all the Plots.Plot arguments (see http://docs.juliaplots.org/latest/attributes)
+
 # Arguments
 * `dataFrames::Dict{Integer, DataFrame}`: A dictionary holding the series-number -> DataFrame
 * `plotFunction::Function`: A function that accepts a DataFrame, the series index, the
         label for the x-axis, the label for the y-axis, and the plot title
 * `numCols::Int`: Optional name parameter the specifies the number of subplot columns. The
         default value is 2 columns.
-* `width::Int`: Optional width of each subplot
-* `height::Int`: Optional height of each subplot
 * `functionArgs`: The optional arguments that need to passed to the function
 """
 function plotSeries(
     dataFrames::Dict{Integer, DataFrame},
     plotFunction::Function;
     numCols::Int = 2,
-    width::Int = 600,
-    height::Int = 300,
     functionArgs...
 )
 
@@ -114,6 +112,9 @@ function plotSeries(
     # grab the number of subplots (i.e. the number of runs in the simulation series)
     numSeries::Int = length(dataFrames)
 
+    # grab the specified plot size from the function args, or set a default value
+    size = haskey(functionArgs, :size) ? functionArgs[:size] : (600, 300)
+
     numTracesPerPlot::Int = 1
     plots = []
     for entry in sort(collect(dataFrames), by = key -> key[1])
@@ -126,7 +127,7 @@ function plotSeries(
         args = createTitle(args, index)
 
         # add the size (width, height) of the subplots to the arguments
-        args = (args..., size=(width, height))
+        args = (args..., size=size)
 
         # create the axis identifiers. The first plot gets the largest y-axis id
         # so that the first dataframe in the series is the first plot at the top
@@ -145,7 +146,7 @@ function plotSeries(
         plots...,
         layout=(numRows, numCols),
         legend=false,
-        size=(width * numCols, height * numRows)
+        size=(size[1] * numCols, size[2] * numRows)
     )
 end
 
