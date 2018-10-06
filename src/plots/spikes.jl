@@ -23,6 +23,7 @@ function plotSpikes(
     xLabel::String="t (ms)", 
     yLabel::String="neuron", 
     title::String="spikes",
+    spacing::Int=4,
     args...
 )::Plots.Plot
     if size(dataFrame)[1] == 0
@@ -36,19 +37,29 @@ function plotSpikes(
     # of data
     spikeSeries = groupby(spikes, [:neuron_id], sort = true)
 
+    # grabs the size of the plot if it was a argument to this function, otherwise sets
+    # it to a default value
+    plotSize = haskey(args, :size) ? args[:size] : (600, 400)
+
     # now plot each one
     seriesPlot = scatter(
         title=title,
         titlefont=font(8),
         titleloc=series > 0 ? :right : :center,
         xlabel=xLabel,
-        ylabel=yLabel
+        ylabel=yLabel,
+        size=plotSize
     );
 
+    # calculate the marker size, which is the radius (in pixels) of the marker.
+    # in the spikes plot, we use a vline, so the radius should be half the height
+    # allocated to a series.
     height = seriesPlot[:size][2]
-    margin = xLabel == "" ? 50 : 10
-    markerSize = max(2, floor((args[:size][2] - margin)/length(spikeSeries)/4))
-    println(markerSize)
+
+    # the plot margin changes slightly when there is an x-axis lable
+    plotMargin = xLabel == "" ? 55 : 70
+    seriesHeight = (height - plotMargin) / max(1, length(spikeSeries) - 1)
+    markerSize = max(2, floor(seriesHeight / 3) - spacing)
 
     i = 1
     for series in spikeSeries
