@@ -33,8 +33,8 @@ function plotSpikes(
     # make a copy of the data frame
     spikes = DataFrame(dataFrame)
 
-    # group by the connections to get an array of dataframes, each holding the time-series
-    # of data
+    # group by the neuron ID to get an array of dataframes, each holding the time-series
+    # of spike events
     spikeSeries = groupby(spikes, [:neuron_id], sort = true)
 
     # grabs the size of the plot if it was a argument to this function, otherwise sets
