@@ -16,7 +16,7 @@ julia> ]
 (Spikes) pkg>
 ```
 
-Then hit the delete key or ctl^c to exit the package maanger.
+Then hit the delete key or ctl^c to exit the package manager.
 
 ```julia
 julia> using Spikes
