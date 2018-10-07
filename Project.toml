@@ -1,7 +1,7 @@
 name = "Spikes"
 uuid = "43d08cf6-bd20-11e8-08db-4776536e1e7d"
 authors = ["Robert Philipp <rob.philipp@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 DataArrays = "0fe7c1db-08c2-54a3-a222-6d1d3b7a471a"
