@@ -54,7 +54,7 @@ function plotWeights(
             series[:signal_time], 
             series[:new_weight], 
             seriesPlot, 
-            name=series[:connection][i]
+            label=series[:connection][i]
         )
         i += 1
     end
