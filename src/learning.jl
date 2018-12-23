@@ -138,7 +138,7 @@ function alphaStdp(t::Array{<:Integer}, T::Integer, b::Number, r::Number, tau::I
     timeFactor = (delta .- (t .- T)) ./ tau
     r * Spikes.heaviside(wMax - w) .* map(timeFactor) do tf 
         max(b, exp(1) * (1 - b) * tf * exp(-tf) + b)
-    end
+    end .* map(t) do time if time > T + delta exp((T + delta - time)/tau) else 1 end end
 end
 
 """
