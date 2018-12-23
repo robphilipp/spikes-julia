@@ -1,6 +1,6 @@
 using Spikes
 
-using RDatasets, DataFrames #, DataArrays
+using RDatasets, DataFrames
 using LaTeXStrings
 
 const LEARNING_TYPE = "learning_type"
@@ -135,21 +135,23 @@ Learning function for STDP that uses an alpha function
 """
 function alphaStdp(t::Array{<:Integer}, T::Integer, b::Number, r::Number, tau::Integer, w::Number, wMax::Number)
     delta = zeroOffset(tau, b)
-    timeFactor = (delta - (t .- T)) / tau
-    r * Spikes.heaviside(wMax - w) * max(b, exp(1) * (1 - b) * timeFactor .* exp(-timeFactor) + b)
+    timeFactor = (delta .- (t .- T)) ./ tau
+    r * Spikes.heaviside(wMax - w) .* map(timeFactor) do tf 
+        max(b, exp(1) * (1 - b) * tf * exp(-tf) + b)
+    end
 end
 
 """
-    zeroOffset(tau::Integer, b::Real)::Number
+    zeroOffset(tau::Integer, b::Number)::Number
 
 Calculates the first approximation to the time offset required so
-that zero of the ``\alpha``-function is at t=0
+that zero of the alpha-function is at t=0
 
 # Arguments
 * `tau::Integer`: The time-constant (tau > 0)
-* `b::Real`: The baseline (b ≤ 0) that represents the inhibition amount
+* `b::Number`: The baseline (b ≤ 0) that represents the inhibition amount
 """
-function zeroOffset(tau::Integer, b::Real)::Number
+function zeroOffset(tau::Integer, b::Number)::Number
     gamma::Number = -b * exp(-1) / (1 - b)
     R = (27 * gamma - 7) / 54
     Q = 2.0 / 9
