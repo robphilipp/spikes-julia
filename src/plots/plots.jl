@@ -19,7 +19,7 @@ Generates a vector of strings for the hover labels for when the user hovers over
 # Return
 An `Array{String}` holding label strings for the series
 """
-function hoverLabels(x::Array{Float64,1}, y::Array{Float64,1}, name::String = "")
+function hoverLabels(x::AbstractArray{Float64,1}, y::AbstractArray{Float64,1}, name::String = "")
     map(p -> "($(sprintf1("%'d", p[1])) ms, $(sprintf1("%5.3f", p[2]))) [$(name)]", zip(x, y))
 end
 
@@ -38,7 +38,7 @@ Adds the (x, y)-pair series to the plot and returns the updated plot
 # Returns
 A `Plots.Plot`
 """
-function addSeriesToPlot(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; args...)
+function addSeriesToPlot(x::AbstractArray{Float64,1}, y::AbstractArray{Float64,1}, p::Plots.Plot; args...)
     name = haskey(args, :label) ? args[:label] : ""
     plot!(p, x, y, label=name, hover=hoverLabels(x, y, name))
 end
@@ -57,7 +57,7 @@ Adds the (x, y)-pair series to the scatter-plot and returns the updated plot
 # Returns
 A `Plots.Plot`
 """
-function addSeriesToScatter(x::Array{Float64,1}, y::Array{Float64,1}, p::Plots.Plot; args...)
+function addSeriesToScatter(x::AbstractArray{Float64,1}, y::AbstractArray{Float64,1}, p::Plots.Plot; args...)
     name = haskey(args, :label) ? args[:label] : ""
     scatter!(
         p, 
