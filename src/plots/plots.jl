@@ -1,7 +1,7 @@
 using Spikes
 using DataFrames
 using Plots
-using StatPlots
+using StatsPlots
 using RDatasets
 using Query
 using Formatting
