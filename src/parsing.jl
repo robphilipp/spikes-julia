@@ -14,7 +14,7 @@ const TOPOLOGY = "topology"
 const NEURON_ID = "neuron_id"
 const LOCATION = "location"
 
-const CONNECTION = "network_connected"
+const CONNECTION = "networkConnected"
 const PRE_SYNAPTIC_ID = "pre_synaptic"
 const POST_SYNAPTIC_ID = "post_synaptic"
 const PRE_SYNAPTIC_LOCATION = "pre_synaptic_location"
@@ -39,7 +39,7 @@ dictionary holding the values from the log line
     pair separated from another pair by a "; "
 """
 function parseIntoDict(logLine::String)::Tuple{String,Dict{Any,Any}}
-    networkInfo = replace(split(logLine, " - ")[2], r"\n" => s"")
+    networkInfo = replace(split(logLine, " - ")[2], r"\n" => "")
     commands = split(networkInfo, "; ")
 
     dictionary = Dict()
@@ -161,12 +161,12 @@ Parses the log-lines into a data-frame with the following keys
 
 # Example of the log-lines
 ```text
-... - network_connected; pre_synaptic: input-1; post_synaptic: output-1; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=-300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); distance: 100.00 µm
-... - network_connected; pre_synaptic: input-1; post_synaptic: output-2; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=-300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); distance: 608.28 µm
-... - network_connected; pre_synaptic: input-2; post_synaptic: output-1; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); distance: 608.28 µm
-... - network_connected; pre_synaptic: input-2; post_synaptic: output-2; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); distance: 100.00 µm
-... - network_connected; pre_synaptic: output-1; post_synaptic: inhib-1; initial_weight: 1.0; equilibrium_weight: 1.0; pre_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); post_synaptic_location: (x=-290 µm, y=0 µm, z=0 µm); distance: 10.00 µm
-... - network_connected; pre_synaptic: output-2; post_synaptic: inhib-2; initial_weight: 1.0; equilibrium_weight: 1.0; pre_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); post_synaptic_location: (x=290 µm, y=0 µm, z=0 µm); distance: 10.00 µm
+... - networkConnected; pre_synaptic: input-1; post_synaptic: output-1; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=-300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); distance: 100.00 µm
+... - networkConnected; pre_synaptic: input-1; post_synaptic: output-2; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=-300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); distance: 608.28 µm
+... - networkConnected; pre_synaptic: input-2; post_synaptic: output-1; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); distance: 608.28 µm
+... - networkConnected; pre_synaptic: input-2; post_synaptic: output-2; initial_weight: 0.5; equilibrium_weight: 0.5; pre_synaptic_location: (x=300 µm, y=0 µm, z=100 µm); post_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); distance: 100.00 µm
+... - networkConnected; pre_synaptic: output-1; post_synaptic: inhib-1; initial_weight: 1.0; equilibrium_weight: 1.0; pre_synaptic_location: (x=-300 µm, y=0 µm, z=0 µm); post_synaptic_location: (x=-290 µm, y=0 µm, z=0 µm); distance: 10.00 µm
+... - networkConnected; pre_synaptic: output-2; post_synaptic: inhib-2; initial_weight: 1.0; equilibrium_weight: 1.0; pre_synaptic_location: (x=300 µm, y=0 µm, z=0 µm); post_synaptic_location: (x=290 µm, y=0 µm, z=0 µm); distance: 10.00 µm
 ```
 """
 function connectionTopology(logLines::Array{String})::DataFrame
@@ -180,7 +180,7 @@ function connectionTopology(logLines::Array{String})::DataFrame
     postX3 = Array{Float64,1}()
     initialWeight = Array{Float64,1}()
     for line in logLines
-        if occursin(r" - network_connected; pre_synaptic: [a-z]+-[0-9]+; post_synaptic: [a-z]+-[0-9]+;", line)
+        if occursin(r" - networkConnected; pre_synaptic: [a-z]+-[0-9]+; post_synaptic: [a-z]+-[0-9]+;", line)
             # create the dictionary that holds the values of the line
             dict = parseIntoDict(line)
     
@@ -273,7 +273,7 @@ Parses the intrinsic-plasticity update events (i.e. the neuron bias) into
 a data frame with the following keys
 * `neuron_id`: the ID of the neuron whose plasticity (bias) was updated
 * `timestamp`: the time (simulation, ms) of the update event
-* `intrinsic_plasticity`: the updated value of the intrinsic plasticity
+* `intrinsicPlasticity`: the updated value of the intrinsic plasticity
     (i.e. the bias) 
 
 # Arguments
@@ -281,7 +281,7 @@ a data frame with the following keys
 
 # Example log lines
 ```text
-... - intrinsic_plasticity; id: inhib-2; timestamp: 173.0 ms; intrinsic_plasticity: 0.0 mV
+... - intrinsicPlasticity; id: inhib-2; timestamp: 173.0 ms; intrinsicPlasticity: 0.0 mV
 ```
 """
 function intrinsicPlasticityEvents(logLines::Array{String})::DataFrame
@@ -290,18 +290,18 @@ function intrinsicPlasticityEvents(logLines::Array{String})::DataFrame
     intrinsicPlasticity = Array{Float64, 1}()
 
     for line in logLines
-        if occursin(r" - intrinsic_plasticity; id: [a-z]+-[0-9]+(.[0-9]+)*;", line)
+        if occursin(r" - intrinsicPlasticity; id: [a-z]+-[0-9]+(.[0-9]+)*;", line)
             dict = parseIntoDict(line)
 
             push!(neuronIds, string(dict[2]["id"]))
             push!(timestamp, parse(Float64, split(dict[2]["timestamp"], " ")[1]))
-            push!(intrinsicPlasticity, parse(Float64, split(dict[2]["intrinsic_plasticity"], " ")[1]))
+            push!(intrinsicPlasticity, parse(Float64, split(dict[2]["intrinsicPlasticity"], " ")[1]))
         end
     end
     dataFrame = DataFrame(
         neuron_id = neuronIds,
         timestamp = timestamp,
-        intrinsic_plasticity = intrinsicPlasticity
+        intrinsicPlasticity = intrinsicPlasticity
     )
 end
 
